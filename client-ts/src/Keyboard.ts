@@ -24,5 +24,26 @@ function onKeyFactory(isDown: boolean) {
     }
 }
 
+export function isRotateLeft(key: string) {
+    return key === K_Z;
+}
+export function isRotateRight(key: string) {
+    return key === K_X;
+}
+
+export function isMoveLeft(key: string) {
+    return key === K_LEFT;
+}
+export function isMoveRight(key: string) {
+    return key === K_RIGHT;
+}
+
+export function isMoveDown(key: string) {
+    return key === K_DOWN;
+}
+export function isDrop(key: string) {
+    return key === K_SPACE_BAR || key === K_UP;
+}
+
 window.addEventListener('keydown', onKeyFactory(true));
 window.addEventListener('keyup',   onKeyFactory(false));

@@ -3,7 +3,7 @@ import { BoardData, Cell, DbConnection, ErrorContext, EventContext } from './mod
 
 import { Board } from './Board';
 import { BoardCanvas } from './BoardCanvas';
-import { onKey } from './Keyboard';
+import { onKey, isRotateLeft, isRotateRight, isMoveLeft, isMoveRight, isMoveDown, isDrop } from './Keyboard';
 
 ////
 
@@ -85,7 +85,21 @@ conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
 
 onKey((key: string, isDown: boolean) => {
     if (!isDown) return;
-    console.log(`key down: ${key}`);
+
+    if (isRotateLeft(key)) {
+        console.log('rotate left');
+    } else if (isRotateRight(key)) {
+        console.log('rotate right');
+    } else if (isMoveLeft(key)) {
+        console.log('move left');
+    } else if (isMoveRight(key)) {
+        console.log('move right');
+    } else if (isMoveDown(key)) {
+        console.log('move down');
+    } else if (isDrop(key)) {
+        console.log('drop');
+    }
+    //console.log(`key down: ${key}`);
 });
 
 // @ts-ignore
