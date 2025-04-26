@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+//#![allow(dead_code)]
 
 mod bricks;
 mod tetris;
@@ -50,8 +50,8 @@ pub fn init(ctx: &ReducerContext) {
     // called at module start
     log::info!("tetris-game init started");
 
-    let mut b = Board::new(); // TODO randomness from ctx.rng
-                              //b.move_left();
+    let mut b = Board::new(ctx); // TODO randomness from ctx.rng
+                                 //b.move_left();
     b.apply_piece();
 
     //let brick = b.get_piece();

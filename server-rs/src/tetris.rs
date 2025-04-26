@@ -1,4 +1,9 @@
 //use rand::prelude::*;
+//use rand::Rng;
+
+use rand::Rng;
+//use spacetimedb::StdbRng;
+use spacetimedb::ReducerContext;
 
 use crate::bricks::{I, J, L, O, S, T, Z};
 
@@ -21,7 +26,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new() -> Self {
+    pub fn new(ctx: &ReducerContext) -> Self {
         let mut b = Board {
             cells: [[0; WIDTH as usize]; HEIGHT as usize],
             selected_piece: 0,
@@ -34,7 +39,7 @@ impl Board {
             lines: 0,
         };
 
-        b.random_piece();
+        b.random_piece(ctx);
 
         b
     }
@@ -78,24 +83,25 @@ impl Board {
         }
     }
 
-    pub fn random_piece(&mut self) -> bool {
+    pub fn random_piece(&mut self, ctx: &ReducerContext) -> bool {
+        let mut rng = ctx.rng();
         if self.score == 0 {
-            self.selected_piece = 0; //self.rng.random_range(0..7);
+            self.selected_piece = rng.gen_range(0..7);
             self.selected_piece_variant = if self.selected_piece == 3 {
                 0
             } else {
-                0 //self.rng.random_range(0..4)
+                rng.gen_range(0..4)
             };
         } else {
             self.selected_piece = self.next_piece;
             self.selected_piece_variant = self.next_piece_variant;
         }
 
-        self.next_piece = 0; //self.rng.random_range(0..7);
+        self.next_piece = rng.gen_range(0..7);
         self.next_piece_variant = if self.next_piece == 3 {
             0
         } else {
-            0 //self.rng.random_range(0..4)
+            rng.gen_range(0..4)
         };
 
         self.position = (WIDTH / 2, 0);
@@ -194,13 +200,6 @@ impl Board {
         self.position.1 = self.ghost_y;
         self.adjust_piece_placement();
         true
-    }
-
-    pub fn reset(&mut self) {
-        self.cells = [[0; WIDTH as usize]; HEIGHT as usize];
-        self.score = 0;
-        self.lines = 0;
-        self.random_piece();
     }
 
     pub fn place_piece(&mut self, pos: (u8, u8), brick: &[(i8, i8); 4], color: u8) {

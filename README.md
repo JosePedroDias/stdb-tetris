@@ -20,7 +20,6 @@ npm run dev
 
 ## TODO
 
-- Board::init should use ctx.rng
 - Board::from_tables(cells, board_data) -> Board
 - board.update_tables(ctx)
 - create a "timer" to move bricks down
