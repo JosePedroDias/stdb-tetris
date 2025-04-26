@@ -1,7 +1,10 @@
+import { Board } from './Board';
 import { BoardData, Cell, DbConnection, ErrorContext, EventContext } from './module_bindings';
 import { Identity } from '@clockworklabs/spacetimedb-sdk';
 
 ////
+
+const b = new Board();
 
 const onConnect = (
     _conn: DbConnection,
@@ -44,25 +47,38 @@ const conn = DbConnection.builder()
     .build();
 
 conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
-    console.log('New bd:', bd);
+    //console.log('New bd:', bd);
+    b.lines = bd.lines;
+    b.score = bd.score;
+    b.nextPiece = bd.nextPiece;
 });
 conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) => {
-    console.log('Bd updated to:', bd);
+    //console.log('Bd updated to:', bd);
+    b.lines = bd.lines;
+    b.score = bd.score;
+    b.nextPiece = bd.nextPiece;
 });
-conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
-    console.log('Bd deleted:', bd);
-});
+/*conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
+    //console.log('Bd deleted:', bd);
+    b.lines = bd.lines;
+    b.score = bd.score;
+    b.nextPiece = bd.nextPiece;
+});*/
 
 conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
-    console.log('New cell:', c);
+    //console.log('New cell:', c);
+    b.setCell(c.x, c.y, c.value);
 });
 conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
-    console.log('Cell updated to:', c);
+    //console.log('Cell updated to:', c);
+    b.setCell(c.x, c.y, c.value);
 });
-conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
-    console.log('Cell deleted:', c);
-});
+/*conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
+    //console.log('Cell deleted:', c);
+});*/
 
 // @ts-ignore
 window.conn = conn;
+// @ts-ignore
+window.b = b;
 //conn.reducers.whoAmI();
