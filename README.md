@@ -20,10 +20,11 @@ npm run dev
 
 ## TODO
 
-- Board::new(ctx) -> Board (for now, called on init reducer)
+- Board::init should use ctx.rng
 - Board::from_tables(cells, board_data) -> Board
 - board.update_tables(ctx)
-- expose reducers
+- create a "timer" to move bricks down
+- expose reducers for player input
 
 ## Model data
 

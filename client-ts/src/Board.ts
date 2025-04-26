@@ -1,5 +1,5 @@
-const WIDTH = 10;
-const HEIGHT = 20;
+export const WIDTH = 10;
+export const HEIGHT = 20;
 
 export class Board {
     cells: number[][];

@@ -1,10 +1,14 @@
-import { Board } from './Board';
-import { BoardData, Cell, DbConnection, ErrorContext, EventContext } from './module_bindings';
 import { Identity } from '@clockworklabs/spacetimedb-sdk';
+import { BoardData, Cell, DbConnection, ErrorContext, EventContext } from './module_bindings';
+
+import { Board } from './Board';
+import { BoardCanvas } from './BoardCanvas';
+import { onKey } from './Keyboard';
 
 ////
 
 const b = new Board();
+const bc = new BoardCanvas(b);
 
 const onConnect = (
     _conn: DbConnection,
@@ -68,14 +72,21 @@ conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) =
 conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
     //console.log('New cell:', c);
     b.setCell(c.x, c.y, c.value);
+    bc.draw(); // TODO
 });
 conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
     //console.log('Cell updated to:', c);
     b.setCell(c.x, c.y, c.value);
+    bc.draw(); // TODO
 });
 /*conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
     //console.log('Cell deleted:', c);
 });*/
+
+onKey((key: string, isDown: boolean) => {
+    if (!isDown) return;
+    console.log(`key down: ${key}`);
+});
 
 // @ts-ignore
 window.conn = conn;
