@@ -57,4 +57,4 @@ conn.db.card.onDelete((_ctx: EventContext, card: Card) => {
 
 // @ts-ignore
 window.conn = conn;
-// conn.reducers.whoAmI();
+//conn.reducers.whoAmI();

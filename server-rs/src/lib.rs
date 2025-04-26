@@ -1,5 +1,11 @@
 #![allow(dead_code)]
 
+mod bricks;
+mod tetris;
+
+//use crate::bricks::{I, J, L, O, S, T, Z};
+use crate::tetris::Board;
+
 use rand::{seq::SliceRandom, Rng};
 use spacetimedb::{
     client_visibility_filter, Filter, Identity, ReducerContext, SpacetimeType, Table,
@@ -10,6 +16,14 @@ use spacetimedb::{
 #[spacetimedb::reducer(init)]
 pub fn init(_ctx: &ReducerContext) {
     // called at module start
+    log::info!("tetris-game init started");
+
+    let mut b = Board::new();
+    b.move_left();
+    b.apply_piece();
+    log::info!("{}", b);
+
+    log::info!("tetris-game init just ran");
 }
 
 #[spacetimedb::reducer(client_connected)]
@@ -28,8 +42,8 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
     log::info!("client {} disconnected done.", ctx.sender);
 }
 
-// #[spacetimedb::reducer]
-// pub fn who_am_i(ctx: &ReducerContext) {
-//     //let pl = ctx.db.player().id().find(ctx.sender).unwrap();
-//     log::info!("you are {}!", ctx.sender);
-// }
+#[spacetimedb::reducer]
+pub fn who_am_i(ctx: &ReducerContext) {
+    //let pl = ctx.db.player().id().find(ctx.sender).unwrap();
+    log::info!("you are {}!", ctx.sender);
+}
