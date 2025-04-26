@@ -205,7 +205,10 @@ impl Board {
     }
 
     pub fn place_piece(&mut self, pos: (u8, u8), brick: &[(i8, i8); 4], color: u8) {
-        let positions: Vec<(i8, i8)> = self.piece_iter(pos, brick).collect();
+        let positions: Vec<(i8, i8)> = brick
+            .iter()
+            .map(move |(x, y)| (x + pos.0 as i8, y + pos.1 as i8))
+            .collect();
         for (x, y) in positions {
             if x >= 0 && x < WIDTH as i8 && y >= 0 && y < HEIGHT as i8 {
                 self.cells[y as usize][x as usize] = color;
@@ -214,7 +217,10 @@ impl Board {
     }
 
     pub fn piece_doesnt_collide(&mut self, pos: (u8, u8), brick: &[(i8, i8); 4]) -> bool {
-        for (x, y) in self.piece_iter(pos, brick) {
+        for (x, y) in brick
+            .iter()
+            .map(move |(x, y)| (x + pos.0 as i8, y + pos.1 as i8))
+        {
             if x >= 0 && x < WIDTH as i8 && y >= 0 && y < HEIGHT as i8 {
                 if self.cells[y as usize][x as usize] != 0 {
                     return false;
@@ -234,7 +240,10 @@ impl Board {
         let mut y0 = true;
         let mut y1 = true;
 
-        for (x, y) in self.piece_iter(pos, brick) {
+        for (x, y) in brick
+            .iter()
+            .map(move |(x, y)| (x + pos.0 as i8, y + pos.1 as i8))
+        {
             if x < 0 {
                 x0 = false;
             }
@@ -251,13 +260,17 @@ impl Board {
         (x0, x1, y0, y1)
     }
 
-    fn piece_iter(&self, pos: (u8, u8), brick: &[(i8, i8); 4]) -> impl Iterator<Item = (i8, i8)> {
+    fn piece_iter<'a>(
+        &self,
+        pos: (u8, u8),
+        brick: &'a [(i8, i8); 4],
+    ) -> impl Iterator<Item = (i8, i8)> + 'a {
         brick
             .iter()
             .map(move |(x, y)| (x + pos.0 as i8, y + pos.1 as i8))
     }
 
-    fn lines_rev_iter(&self) -> impl Iterator<Item = (u8, [u8; WIDTH as usize])> {
+    fn lines_rev_iter(&self) -> impl Iterator<Item = (u8, [u8; WIDTH as usize])> + '_ {
         (0..HEIGHT)
             .rev()
             .into_iter()
@@ -268,7 +281,7 @@ impl Board {
         (0..HEIGHT).map(move |y| (y))
     }
 
-    pub fn board_iter(&self) -> impl Iterator<Item = (u8, u8, u8)> {
+    pub fn board_iter(&self) -> impl Iterator<Item = (u8, u8, u8)> + '_ {
         (0..HEIGHT)
             .flat_map(move |y| (0..WIDTH).map(move |x| (x, y, self.cells[y as usize][x as usize])))
     }
@@ -300,19 +313,6 @@ impl Board {
         }
 
         true
-    }
-
-    pub fn print_line<W: Write>(&self, y: u8, writer: &mut W) -> std::io::Result<()> {
-        for x in 0..WIDTH {
-            let v = self.cells[y as usize][x as usize];
-            let c = match v {
-                0 => '.',
-                _ => '#',
-            };
-            //write!(writer, "{}", c)?;
-            write!(writer, "{}{}", c, c)?;
-        }
-        Ok(())
     }
 
     pub fn apply_piece(&mut self) {

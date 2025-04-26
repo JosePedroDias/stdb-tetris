@@ -19,9 +19,14 @@ pub fn init(_ctx: &ReducerContext) {
     log::info!("tetris-game init started");
 
     let mut b = Board::new();
-    b.move_left();
+    //b.move_left();
     b.apply_piece();
-    log::info!("{}", b);
+
+    let brick = b.get_piece();
+    log::info!("brick: {:?}", brick); //, brick[0].0);
+
+    log::info!("display board\n{}", b);
+    log::info!("debug board{:?}", b);
 
     log::info!("tetris-game init just ran");
 }
