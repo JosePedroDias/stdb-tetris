@@ -1,4 +1,4 @@
-import { DbConnection, ErrorContext } from './module_bindings';
+import { BoardData, Cell, DbConnection, ErrorContext, EventContext } from './module_bindings';
 import { Identity } from '@clockworklabs/spacetimedb-sdk';
 
 ////
@@ -15,8 +15,8 @@ const onConnect = (
         identity.toHexString()
     );
     
-    //conn.subscriptionBuilder().subscribe('SELECT * FROM card');
-    //conn.subscriptionBuilder().subscribe('SELECT * FROM card_face');
+    conn.subscriptionBuilder().subscribe('SELECT * FROM cell');
+    conn.subscriptionBuilder().subscribe('SELECT * FROM board_data');
 
     /*
     conn.reducers.onWhoAmI(() => {
@@ -43,17 +43,25 @@ const conn = DbConnection.builder()
     .onConnectError(onConnectError)
     .build();
 
-/*
-conn.db.card.onInsert((_ctx: EventContext, card: Card) => {
-    console.log('New card:', cardToString(card));
+conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
+    console.log('New bd:', bd);
 });
-conn.db.card.onUpdate((_ctx: EventContext, _card: Card, card: Card) => {
-    console.log('Card updated to:', cardToString(card));
+conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) => {
+    console.log('Bd updated to:', bd);
 });
-conn.db.card.onDelete((_ctx: EventContext, card: Card) => {
-    console.log('Card deleted:', cardToString(card));
+conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
+    console.log('Bd deleted:', bd);
 });
-*/
+
+conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
+    console.log('New cell:', c);
+});
+conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
+    console.log('Cell updated to:', c);
+});
+conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
+    console.log('Cell deleted:', c);
+});
 
 // @ts-ignore
 window.conn = conn;

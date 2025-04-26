@@ -40,11 +40,29 @@ import { WhoAmI } from "./who_am_i_reducer.ts";
 export { WhoAmI };
 
 // Import and reexport all table handle types
+import { BoardDataTableHandle } from "./board_data_table.ts";
+export { BoardDataTableHandle };
+import { CellTableHandle } from "./cell_table.ts";
+export { CellTableHandle };
 
 // Import and reexport all types
+import { BoardData } from "./board_data_type.ts";
+export { BoardData };
+import { Cell } from "./cell_type.ts";
+export { Cell };
 
 const REMOTE_MODULE = {
   tables: {
+    board_data: {
+      tableName: "board_data",
+      rowType: BoardData.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+    },
+    cell: {
+      tableName: "cell",
+      rowType: Cell.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+    },
   },
   reducers: {
     identity_connected: {
@@ -134,6 +152,14 @@ export class SetReducerFlags {
 
 export class RemoteTables {
   constructor(private connection: DbConnectionImpl) {}
+
+  get boardData(): BoardDataTableHandle {
+    return new BoardDataTableHandle(this.connection.clientCache.getOrCreateTable<BoardData>(REMOTE_MODULE.tables.board_data));
+  }
+
+  get cell(): CellTableHandle {
+    return new CellTableHandle(this.connection.clientCache.getOrCreateTable<Cell>(REMOTE_MODULE.tables.cell));
+  }
 }
 
 export class SubscriptionBuilder extends SubscriptionBuilderImpl<RemoteTables, RemoteReducers, SetReducerFlags> { }
