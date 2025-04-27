@@ -1,5 +1,8 @@
 // set of bricks from tetris 99
 
+pub const NUM_VARIANTS: u8 = 4;
+pub const NUM_BRICKS: u8 = 7;
+
 /*
     01234 01234 01234 01234
  -1         X
@@ -44,6 +47,8 @@ pub const L: [[(i8, i8); 4]; 4] = [
     [(0, -1), (0, 0), (0, 1), (1, 1)],
     [(-1, 1), (-1, 0), (0, 0), (1, 0)],
 ];
+
+pub const O_INDEX: u8 = 3;
 
 /*
     012

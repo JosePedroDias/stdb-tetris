@@ -1,6 +1,7 @@
 use spacetimedb::rand::Rng;
 use spacetimedb::{ReducerContext, Table};
 
+use crate::bricks::{NUM_BRICKS, NUM_VARIANTS, O_INDEX};
 use crate::{
     board_data,
     bricks::{I, J, L, O, S, T, Z},
@@ -136,22 +137,22 @@ impl Board {
     pub fn random_piece(&mut self, ctx: &ReducerContext) -> bool {
         let mut rng = ctx.rng();
         if self.score == 0 {
-            self.selected_piece = rng.gen_range(0..7);
-            self.selected_piece_variant = if self.selected_piece == 3 {
+            self.selected_piece = rng.gen_range(0..NUM_BRICKS);
+            self.selected_piece_variant = if self.selected_piece == O_INDEX {
                 0
             } else {
-                rng.gen_range(0..4)
+                rng.gen_range(0..NUM_VARIANTS)
             };
         } else {
             self.selected_piece = self.next_piece;
             self.selected_piece_variant = self.next_piece_variant;
         }
 
-        self.next_piece = rng.gen_range(0..7);
-        self.next_piece_variant = if self.next_piece == 3 {
+        self.next_piece = rng.gen_range(0..NUM_BRICKS);
+        self.next_piece_variant = if self.next_piece == O_INDEX {
             0
         } else {
-            rng.gen_range(0..4)
+            rng.gen_range(0..NUM_VARIANTS)
         };
 
         self.position = (WIDTH / 2, 0);
@@ -184,7 +185,7 @@ impl Board {
     }
 
     pub fn rotate_right(&mut self) {
-        if self.selected_piece == 3 {
+        if self.selected_piece == O_INDEX {
             return;
         }
         self.selected_piece_variant = (self.selected_piece_variant + 1) % 4;
@@ -192,7 +193,7 @@ impl Board {
     }
 
     pub fn rotate_left(&mut self) {
-        if self.selected_piece == 3 {
+        if self.selected_piece == O_INDEX {
             return;
         }
         self.selected_piece_variant = (self.selected_piece_variant + 3) % 4;

@@ -42,6 +42,10 @@ import { MoveLeft } from "./move_left_reducer.ts";
 export { MoveLeft };
 import { MoveRight } from "./move_right_reducer.ts";
 export { MoveRight };
+import { RotateLeft } from "./rotate_left_reducer.ts";
+export { RotateLeft };
+import { RotateRight } from "./rotate_right_reducer.ts";
+export { RotateRight };
 
 // Import and reexport all table handle types
 import { BoardDataTableHandle } from "./board_data_table.ts";
@@ -89,6 +93,14 @@ const REMOTE_MODULE = {
       reducerName: "move_right",
       argsType: MoveRight.getTypeScriptAlgebraicType(),
     },
+    rotate_left: {
+      reducerName: "rotate_left",
+      argsType: RotateLeft.getTypeScriptAlgebraicType(),
+    },
+    rotate_right: {
+      reducerName: "rotate_right",
+      argsType: RotateRight.getTypeScriptAlgebraicType(),
+    },
   },
   // Constructors which are used by the DbConnectionImpl to
   // extract type information from the generated RemoteModule.
@@ -121,6 +133,8 @@ export type Reducer = never
 | { name: "MoveDown", args: MoveDown }
 | { name: "MoveLeft", args: MoveLeft }
 | { name: "MoveRight", args: MoveRight }
+| { name: "RotateLeft", args: RotateLeft }
+| { name: "RotateRight", args: RotateRight }
 ;
 
 export class RemoteReducers {
@@ -178,6 +192,30 @@ export class RemoteReducers {
     this.connection.offReducer("move_right", callback);
   }
 
+  rotateLeft() {
+    this.connection.callReducer("rotate_left", new Uint8Array(0), this.setCallReducerFlags.rotateLeftFlags);
+  }
+
+  onRotateLeft(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("rotate_left", callback);
+  }
+
+  removeOnRotateLeft(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("rotate_left", callback);
+  }
+
+  rotateRight() {
+    this.connection.callReducer("rotate_right", new Uint8Array(0), this.setCallReducerFlags.rotateRightFlags);
+  }
+
+  onRotateRight(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("rotate_right", callback);
+  }
+
+  removeOnRotateRight(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("rotate_right", callback);
+  }
+
 }
 
 export class SetReducerFlags {
@@ -194,6 +232,16 @@ export class SetReducerFlags {
   moveRightFlags: CallReducerFlags = 'FullUpdate';
   moveRight(flags: CallReducerFlags) {
     this.moveRightFlags = flags;
+  }
+
+  rotateLeftFlags: CallReducerFlags = 'FullUpdate';
+  rotateLeft(flags: CallReducerFlags) {
+    this.rotateLeftFlags = flags;
+  }
+
+  rotateRightFlags: CallReducerFlags = 'FullUpdate';
+  rotateRight(flags: CallReducerFlags) {
+    this.rotateRightFlags = flags;
   }
 
 }

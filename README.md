@@ -23,9 +23,10 @@ clear && npm run build && npm run preview
 
 ## TODO
 
-- refactor position out of the board_data table / subscription
 - create a "timer" to move bricks down
-- expose reducers for player input
+- expose reducers for player input (drop)
+- fix bug?
+- refactor position out of the board_data table / subscription
 
 ## Model data
 

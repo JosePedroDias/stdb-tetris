@@ -145,3 +145,27 @@ pub fn move_right(ctx: &ReducerContext) {
 
     b.to_tables(ctx);
 }
+
+#[spacetimedb::reducer]
+pub fn rotate_left(ctx: &ReducerContext) {
+    //log::info!("rotate_left called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    b.rotate_left();
+    b.apply_piece();
+
+    b.to_tables(ctx);
+}
+
+#[spacetimedb::reducer]
+pub fn rotate_right(ctx: &ReducerContext) {
+    //log::info!("rotate_right called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    b.rotate_right();
+    b.apply_piece();
+
+    b.to_tables(ctx);
+}

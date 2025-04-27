@@ -80,9 +80,9 @@ onKey((key: string, isDown: boolean) => {
     if (!isDown) return;
 
     if (isRotateLeft(key)) {
-        console.log('rotate left');
+        conn.reducers.rotateLeft();
     } else if (isRotateRight(key)) {
-        console.log('rotate right');
+        conn.reducers.rotateRight();
     } else if (isMoveLeft(key)) {
         conn.reducers.moveLeft();
     } else if (isMoveRight(key)) {
