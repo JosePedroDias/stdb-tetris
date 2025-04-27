@@ -119,6 +119,18 @@ pub fn move_down(ctx: &ReducerContext) {
 }
 
 #[spacetimedb::reducer]
+pub fn drop(ctx: &ReducerContext) {
+    //log::info!("drop called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    b.drop();
+    b.apply_piece();
+
+    b.to_tables(ctx);
+}
+
+#[spacetimedb::reducer]
 pub fn move_left(ctx: &ReducerContext) {
     //log::info!("move_left called by {}.", ctx.sender);
     let mut b = Board::from_tables(ctx);

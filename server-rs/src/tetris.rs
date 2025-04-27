@@ -244,6 +244,7 @@ impl Board {
         false
     }
 
+    // TODO confirm correctness or rewrite
     pub fn drop(&mut self) -> bool {
         if self.ghost_y <= self.position.1 {
             return false;

@@ -32,6 +32,8 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 
 // Import and reexport all reducer arg types
+import { Drop } from "./drop_reducer.ts";
+export { Drop };
 import { IdentityConnected } from "./identity_connected_reducer.ts";
 export { IdentityConnected };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
@@ -73,6 +75,10 @@ const REMOTE_MODULE = {
     },
   },
   reducers: {
+    drop: {
+      reducerName: "drop",
+      argsType: Drop.getTypeScriptAlgebraicType(),
+    },
     identity_connected: {
       reducerName: "identity_connected",
       argsType: IdentityConnected.getTypeScriptAlgebraicType(),
@@ -128,6 +134,7 @@ const REMOTE_MODULE = {
 
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
+| { name: "Drop", args: Drop }
 | { name: "IdentityConnected", args: IdentityConnected }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "MoveDown", args: MoveDown }
@@ -139,6 +146,18 @@ export type Reducer = never
 
 export class RemoteReducers {
   constructor(private connection: DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
+
+  drop() {
+    this.connection.callReducer("drop", new Uint8Array(0), this.setCallReducerFlags.dropFlags);
+  }
+
+  onDrop(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("drop", callback);
+  }
+
+  removeOnDrop(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("drop", callback);
+  }
 
   onIdentityConnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.onReducer("identity_connected", callback);
@@ -219,6 +238,11 @@ export class RemoteReducers {
 }
 
 export class SetReducerFlags {
+  dropFlags: CallReducerFlags = 'FullUpdate';
+  drop(flags: CallReducerFlags) {
+    this.dropFlags = flags;
+  }
+
   moveDownFlags: CallReducerFlags = 'FullUpdate';
   moveDown(flags: CallReducerFlags) {
     this.moveDownFlags = flags;

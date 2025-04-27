@@ -90,7 +90,7 @@ onKey((key: string, isDown: boolean) => {
     } else if (isMoveDown(key)) {
         conn.reducers.moveDown();
     } else if (isDrop(key)) {
-        console.log('drop');
+        conn.reducers.drop();
     }
     //console.log(`key down: ${key}`);
 });
