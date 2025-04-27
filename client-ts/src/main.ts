@@ -7,22 +7,35 @@ import { onKey, isRotateLeft, isRotateRight, isMoveLeft, isMoveRight, isMoveDown
 
 ////
 
-const b = new Board();
-const bc = new BoardCanvas(b);
+let ourIdentity: Identity | undefined = undefined;
+
+const boardMap = new Map<number, [Board, BoardCanvas]>();
+
+function getBoard(id: number): [Board, BoardCanvas] {
+    if (boardMap.has(id)) {
+        return boardMap.get(id)!;
+    } else {
+        const b = new Board();
+        const bc = new BoardCanvas(b);
+        boardMap.set(id, [b, bc]);
+        return [b, bc];
+    }
+}
 
 const onConnect = (
     _conn: DbConnection,
     identity: Identity,
     token: string
 ) => {
-    console.log('Our identity:', identity.toHexString());
     localStorage.setItem('auth_token', token);
     console.log(
         'Connected to SpacetimeDB with identity:',
         identity.toHexString()
     );
+    ourIdentity = identity;
     
     conn.subscriptionBuilder().subscribe('SELECT * FROM cell'); // TODO do i need id, or just x and y?
+    //conn.subscriptionBuilder().subscribe('SELECT id, owner, lines, score FROM board_data'); // TODO skip pos_x, pos_y
     conn.subscriptionBuilder().subscribe('SELECT * FROM board_data'); // TODO skip pos_x, pos_y
 };
 
@@ -44,16 +57,28 @@ const conn = DbConnection.builder()
     .build();
 
 conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
+    const boardId = bd.id;
+    const [b, bc] = getBoard(boardId);
+
+    if (bd.owner.isEqual(ourIdentity as Identity)) {
+        bc.isOurs = true;
+    }
+
     //console.log('New bd:', bd);
     b.lines = bd.lines;
     b.score = bd.score;
-    b.nextPiece = bd.nextPiece;
+    //b.nextPiece = bd.nextPiece;
 });
 conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) => {
-    //console.log('Bd updated to:', bd);
-    b.lines = bd.lines;
-    b.score = bd.score;
-    b.nextPiece = bd.nextPiece;
+    if (_bd.score !== bd.score || _bd.lines !== bd.lines) {
+        const boardId = bd.id;
+        const [b, _] = getBoard(boardId);
+
+        console.log(`Bd updated to: ${JSON.stringify(bd, (a, b) => { return a === 'owner' ? 'X' : b; })}`);
+        b.lines = bd.lines;
+        b.score = bd.score;
+        //b.nextPiece = bd.nextPiece;
+    }
 });
 /*conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
     //console.log('Bd deleted:', bd);
@@ -63,11 +88,15 @@ conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) =
 });*/
 
 conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
+    const [b, bc] = getBoard( c.boardId);
+
     //console.log('New cell:', c);
     b.setCell(c.x, c.y, c.value);
     bc.draw(); // TODO
 });
 conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
+    const [b, bc] = getBoard( c.boardId);
+
     //console.log('Cell updated to:', c);
     b.setCell(c.x, c.y, c.value);
     bc.draw(); // TODO
@@ -96,7 +125,4 @@ onKey((key: string, isDown: boolean) => {
 });
 
 // @ts-ignore
-window.conn = conn;
-// @ts-ignore
-window.b = b;
-//conn.reducers.whoAmI();
+//window.conn = conn;

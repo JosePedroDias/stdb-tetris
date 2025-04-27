@@ -24,12 +24,9 @@ clear && npm run build && npm run preview
 
 ## TODO
 
-- fix bug?
-- game over state not being detected?
-- refactor position out of the board_data table / subscription
 - create keys for game_id, group players in sessions of N (2, ...)
-- manage data from multiple players and render multiple boards -> subscriptions should avoid games where the player isn't playing
 - if more than X lines (2?), send garbage to another random player
+- drop should trigger another piece to be added right away, not on next tick
 
 ## Model data
 
@@ -43,6 +40,7 @@ Cell
 
 BoardData
     id: u32
+    owner: Identity,
     selected_piece: u8,
     selected_piece_variant: u8,
     next_piece: u8,
@@ -56,7 +54,7 @@ BoardData
 ScheduleMoveDown ~> move_down_from_timer
     id: u32
     scheduled_at: spacetimedb::ScheduleAt
-    // board_id: u32
+    board_id: u32
 
 ```
 
