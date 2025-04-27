@@ -3,9 +3,9 @@ use spacetimedb::{ReducerContext, Table};
 
 use crate::bricks::{NUM_BRICKS, NUM_VARIANTS, O_INDEX};
 use crate::{
-    board_data,
     bricks::{I, J, L, O, S, T, Z},
-    cell,
+    tables::board_data,
+    tables::cell,
 };
 
 pub const WIDTH: u8 = 10;
