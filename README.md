@@ -22,6 +22,7 @@ npm run dev
 
 - Board::from_tables(cells, board_data) -> Board
 - board.update_tables(ctx)
+- refactor position out of the board_data table / subscription
 - create a "timer" to move bricks down
 - expose reducers for player input
 

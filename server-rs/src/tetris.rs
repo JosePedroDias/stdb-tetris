@@ -1,16 +1,14 @@
-//use rand::prelude::*;
-//use rand::Rng;
-
-use rand::Rng;
 //use spacetimedb::StdbRng;
-use spacetimedb::ReducerContext;
+use spacetimedb::{ReducerContext, Table};
 
-use crate::bricks::{I, J, L, O, S, T, Z};
+use crate::{
+    board_data,
+    bricks::{I, J, L, O, S, T, Z},
+    cell,
+};
 
 pub const WIDTH: u8 = 10;
 pub const HEIGHT: u8 = 20;
-
-use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Board {
@@ -43,6 +41,61 @@ impl Board {
 
         b
     }
+
+    pub fn from_tables(ctx: &ReducerContext) -> Board {
+        let mut b = Board {
+            cells: [[0; WIDTH as usize]; HEIGHT as usize],
+            selected_piece: 0,
+            selected_piece_variant: 0,
+            next_piece: 0,
+            next_piece_variant: 0,
+            position: (0, 0),
+            ghost_y: 0,
+            score: 0,
+            lines: 0,
+        };
+
+        let bd = ctx.db.board_data().id().find(1).unwrap();
+        b.selected_piece = bd.selected_piece;
+        b.selected_piece_variant = bd.selected_piece_variant;
+        b.next_piece = bd.next_piece;
+        b.next_piece_variant = bd.next_piece_variant;
+        b.position = (bd.pos_x, bd.pos_y);
+        b.ghost_y = bd.ghost_y;
+        b.score = bd.score;
+        b.lines = bd.lines;
+
+        for c in ctx.db.cell().iter() {
+            b.cells[c.y as usize][c.x as usize] = c.value;
+        }
+
+        b
+    }
+
+    pub fn update_tables(&self, ctx: &ReducerContext) {
+        let mut bd = ctx.db.board_data().id().find(1).unwrap();
+        bd.selected_piece = self.selected_piece;
+        bd.selected_piece_variant = self.selected_piece_variant;
+        bd.next_piece = self.next_piece;
+        bd.next_piece_variant = bd.next_piece_variant;
+        bd.pos_x = self.position.0;
+        bd.pos_y = self.position.1;
+        bd.ghost_y = self.ghost_y;
+        bd.score = self.score;
+        bd.lines = self.lines;
+        ctx.db.board_data().id().update(bd);
+
+        for mut c in ctx.db.cell().iter() {
+            let value = self.cells[c.y as usize][c.x as usize];
+            if c.value != value {
+                c.value = value;
+                ctx.db.cell().id().update(c);
+            }
+        }
+    }
+
+    //- Board::from_tables(cells, board_data) -> Board
+    //- board.update_tables(ctx)
 
     fn update_ghost_y(&mut self) {
         let br = self.get_piece();
@@ -322,6 +375,7 @@ impl Board {
     }
 }
 
+/*
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for row in self.cells.iter() {
@@ -333,3 +387,4 @@ impl fmt::Display for Board {
         Ok(())
     }
 }
+*/
