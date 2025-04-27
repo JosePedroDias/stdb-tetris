@@ -36,8 +36,8 @@ import { IdentityConnected } from "./identity_connected_reducer.ts";
 export { IdentityConnected };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
-import { WhoAmI } from "./who_am_i_reducer.ts";
-export { WhoAmI };
+import { MoveDown } from "./move_down_reducer.ts";
+export { MoveDown };
 
 // Import and reexport all table handle types
 import { BoardDataTableHandle } from "./board_data_table.ts";
@@ -73,9 +73,9 @@ const REMOTE_MODULE = {
       reducerName: "identity_disconnected",
       argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
     },
-    who_am_i: {
-      reducerName: "who_am_i",
-      argsType: WhoAmI.getTypeScriptAlgebraicType(),
+    move_down: {
+      reducerName: "move_down",
+      argsType: MoveDown.getTypeScriptAlgebraicType(),
     },
   },
   // Constructors which are used by the DbConnectionImpl to
@@ -106,7 +106,7 @@ const REMOTE_MODULE = {
 export type Reducer = never
 | { name: "IdentityConnected", args: IdentityConnected }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
-| { name: "WhoAmI", args: WhoAmI }
+| { name: "MoveDown", args: MoveDown }
 ;
 
 export class RemoteReducers {
@@ -128,24 +128,24 @@ export class RemoteReducers {
     this.connection.offReducer("identity_disconnected", callback);
   }
 
-  whoAmI() {
-    this.connection.callReducer("who_am_i", new Uint8Array(0), this.setCallReducerFlags.whoAmIFlags);
+  moveDown() {
+    this.connection.callReducer("move_down", new Uint8Array(0), this.setCallReducerFlags.moveDownFlags);
   }
 
-  onWhoAmI(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.onReducer("who_am_i", callback);
+  onMoveDown(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("move_down", callback);
   }
 
-  removeOnWhoAmI(callback: (ctx: ReducerEventContext) => void) {
-    this.connection.offReducer("who_am_i", callback);
+  removeOnMoveDown(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("move_down", callback);
   }
 
 }
 
 export class SetReducerFlags {
-  whoAmIFlags: CallReducerFlags = 'FullUpdate';
-  whoAmI(flags: CallReducerFlags) {
-    this.whoAmIFlags = flags;
+  moveDownFlags: CallReducerFlags = 'FullUpdate';
+  moveDown(flags: CallReducerFlags) {
+    this.moveDownFlags = flags;
   }
 
 }

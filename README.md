@@ -20,8 +20,6 @@ npm run dev
 
 ## TODO
 
-- Board::from_tables(cells, board_data) -> Board
-- board.update_tables(ctx)
 - refactor position out of the board_data table / subscription
 - create a "timer" to move bricks down
 - expose reducers for player input
@@ -47,6 +45,11 @@ BoardData
     pub ghost_y: u8,
     pub score: u32,
     pub lines: u32,
+
+ScheduledMoveDown
+    id: u32
+    // board_id: u32
+
 ```
 
 ## client-exposed reducers

@@ -96,7 +96,13 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
 }
 
 #[spacetimedb::reducer]
-pub fn who_am_i(ctx: &ReducerContext) {
-    //let pl = ctx.db.player().id().find(ctx.sender).unwrap();
-    log::info!("you are {}!", ctx.sender);
+pub fn move_down(ctx: &ReducerContext) {
+    log::info!("move_down called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    b.move_down();
+    b.apply_piece();
+
+    b.to_tables(ctx);
 }

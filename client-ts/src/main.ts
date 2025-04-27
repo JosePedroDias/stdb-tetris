@@ -22,8 +22,8 @@ const onConnect = (
         identity.toHexString()
     );
     
-    conn.subscriptionBuilder().subscribe('SELECT * FROM cell');
-    conn.subscriptionBuilder().subscribe('SELECT * FROM board_data');
+    conn.subscriptionBuilder().subscribe('SELECT * FROM cell'); // TODO do i need id, or just x and y?
+    conn.subscriptionBuilder().subscribe('SELECT * FROM board_data'); // TODO skip pos_x, pos_y
 
     /*
     conn.reducers.onWhoAmI(() => {
@@ -95,7 +95,8 @@ onKey((key: string, isDown: boolean) => {
     } else if (isMoveRight(key)) {
         console.log('move right');
     } else if (isMoveDown(key)) {
-        console.log('move down');
+        //console.log('move down');
+        conn.reducers.moveDown();
     } else if (isDrop(key)) {
         console.log('drop');
     }

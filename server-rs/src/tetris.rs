@@ -1,4 +1,4 @@
-//use spacetimedb::StdbRng;
+use spacetimedb::rand::Rng;
 use spacetimedb::{ReducerContext, Table};
 
 use crate::{
@@ -72,7 +72,7 @@ impl Board {
         b
     }
 
-    pub fn update_tables(&self, ctx: &ReducerContext) {
+    pub fn to_tables(&self, ctx: &ReducerContext) {
         let mut bd = ctx.db.board_data().id().find(1).unwrap();
         bd.selected_piece = self.selected_piece;
         bd.selected_piece_variant = self.selected_piece_variant;
@@ -93,9 +93,6 @@ impl Board {
             }
         }
     }
-
-    //- Board::from_tables(cells, board_data) -> Board
-    //- board.update_tables(ctx)
 
     fn update_ghost_y(&mut self) {
         let br = self.get_piece();
