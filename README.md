@@ -23,10 +23,12 @@ clear && npm run build && npm run preview
 
 ## TODO
 
-- create a "timer" to move bricks down
-- expose reducers for player input (drop)
 - fix bug?
+- game over state not being detected?
 - refactor position out of the board_data table / subscription
+- create keys for game_id, group players in sessions of N (2, ...)
+- manage data from multiple players and render multiple boards -> subscriptions should avoid games where the player isn't playing
+- if more than X lines (2?), send garbage to another random player
 
 ## Model data
 
@@ -50,8 +52,9 @@ BoardData
     pub score: u32,
     pub lines: u32,
 
-ScheduledMoveDown
+ScheduleMoveDown ~> move_down_from_timer
     id: u32
+    scheduled_at: spacetimedb::ScheduleAt
     // board_id: u32
 
 ```

@@ -6,7 +6,8 @@ mod tetris;
 use crate::tetris::Board;
 
 //use rand::{seq::SliceRandom, Rng};
-use spacetimedb::{ReducerContext, Table};
+use spacetimedb::{ReducerContext, ScheduleAt, Table};
+use std::time::Duration;
 
 /////// TABLES
 
@@ -43,6 +44,15 @@ pub struct BoardData {
     lines: u32,
 }
 
+#[spacetimedb::table(name = schedule_move_down, scheduled(move_down_from_timer))]
+#[derive(Debug, Clone)]
+struct ScheduleMoveDown {
+    #[primary_key]
+    #[auto_inc]
+    id: u64,
+    scheduled_at: ScheduleAt,
+}
+
 /////// REDUCERS
 
 #[spacetimedb::reducer(init)]
@@ -76,6 +86,11 @@ pub fn init(ctx: &ReducerContext) {
         lines: b.lines,
     });
 
+    ctx.db.schedule_move_down().insert(ScheduleMoveDown {
+        id: 0,
+        scheduled_at: ScheduleAt::Interval(Duration::from_millis(500).into()), // 2 fps ~ 500 ms
+    });
+
     log::info!("tetris-game init just ran");
 }
 
@@ -96,7 +111,16 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
 }
 
 #[spacetimedb::reducer]
+fn move_down_from_timer(ctx: &ReducerContext, _timer_row: ScheduleMoveDown) {
+    move_down_(ctx);
+}
+
+#[spacetimedb::reducer]
 pub fn move_down(ctx: &ReducerContext) {
+    move_down_(ctx);
+}
+
+fn move_down_(ctx: &ReducerContext) {
     //log::info!("move_down called by {}.", ctx.sender);
     let mut b = Board::from_tables(ctx);
 

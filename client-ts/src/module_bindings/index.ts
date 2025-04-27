@@ -40,6 +40,8 @@ import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
 import { MoveDown } from "./move_down_reducer.ts";
 export { MoveDown };
+import { MoveDownFromTimer } from "./move_down_from_timer_reducer.ts";
+export { MoveDownFromTimer };
 import { MoveLeft } from "./move_left_reducer.ts";
 export { MoveLeft };
 import { MoveRight } from "./move_right_reducer.ts";
@@ -54,12 +56,16 @@ import { BoardDataTableHandle } from "./board_data_table.ts";
 export { BoardDataTableHandle };
 import { CellTableHandle } from "./cell_table.ts";
 export { CellTableHandle };
+import { ScheduleMoveDownTableHandle } from "./schedule_move_down_table.ts";
+export { ScheduleMoveDownTableHandle };
 
 // Import and reexport all types
 import { BoardData } from "./board_data_type.ts";
 export { BoardData };
 import { Cell } from "./cell_type.ts";
 export { Cell };
+import { ScheduleMoveDown } from "./schedule_move_down_type.ts";
+export { ScheduleMoveDown };
 
 const REMOTE_MODULE = {
   tables: {
@@ -71,6 +77,11 @@ const REMOTE_MODULE = {
     cell: {
       tableName: "cell",
       rowType: Cell.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+    },
+    schedule_move_down: {
+      tableName: "schedule_move_down",
+      rowType: ScheduleMoveDown.getTypeScriptAlgebraicType(),
       primaryKey: "id",
     },
   },
@@ -90,6 +101,10 @@ const REMOTE_MODULE = {
     move_down: {
       reducerName: "move_down",
       argsType: MoveDown.getTypeScriptAlgebraicType(),
+    },
+    move_down_from_timer: {
+      reducerName: "move_down_from_timer",
+      argsType: MoveDownFromTimer.getTypeScriptAlgebraicType(),
     },
     move_left: {
       reducerName: "move_left",
@@ -138,6 +153,7 @@ export type Reducer = never
 | { name: "IdentityConnected", args: IdentityConnected }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "MoveDown", args: MoveDown }
+| { name: "MoveDownFromTimer", args: MoveDownFromTimer }
 | { name: "MoveLeft", args: MoveLeft }
 | { name: "MoveRight", args: MoveRight }
 | { name: "RotateLeft", args: RotateLeft }
@@ -185,6 +201,22 @@ export class RemoteReducers {
 
   removeOnMoveDown(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("move_down", callback);
+  }
+
+  moveDownFromTimer(timerRow: ScheduleMoveDown) {
+    const __args = { timerRow };
+    let __writer = new BinaryWriter(1024);
+    MoveDownFromTimer.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("move_down_from_timer", __argsBuffer, this.setCallReducerFlags.moveDownFromTimerFlags);
+  }
+
+  onMoveDownFromTimer(callback: (ctx: ReducerEventContext, timerRow: ScheduleMoveDown) => void) {
+    this.connection.onReducer("move_down_from_timer", callback);
+  }
+
+  removeOnMoveDownFromTimer(callback: (ctx: ReducerEventContext, timerRow: ScheduleMoveDown) => void) {
+    this.connection.offReducer("move_down_from_timer", callback);
   }
 
   moveLeft() {
@@ -248,6 +280,11 @@ export class SetReducerFlags {
     this.moveDownFlags = flags;
   }
 
+  moveDownFromTimerFlags: CallReducerFlags = 'FullUpdate';
+  moveDownFromTimer(flags: CallReducerFlags) {
+    this.moveDownFromTimerFlags = flags;
+  }
+
   moveLeftFlags: CallReducerFlags = 'FullUpdate';
   moveLeft(flags: CallReducerFlags) {
     this.moveLeftFlags = flags;
@@ -279,6 +316,10 @@ export class RemoteTables {
 
   get cell(): CellTableHandle {
     return new CellTableHandle(this.connection.clientCache.getOrCreateTable<Cell>(REMOTE_MODULE.tables.cell));
+  }
+
+  get scheduleMoveDown(): ScheduleMoveDownTableHandle {
+    return new ScheduleMoveDownTableHandle(this.connection.clientCache.getOrCreateTable<ScheduleMoveDown>(REMOTE_MODULE.tables.schedule_move_down));
   }
 }
 
