@@ -11,6 +11,7 @@ spacetime logs tetris-game
 
 spacetime sql tetris-game "SELECT * FROM cell"
 spacetime sql tetris-game "SELECT COUNT(*) as count FROM cell"
+spacetime sql tetris-game "SELECT COUNT(*) AS count FROM cell WHERE value != 0"
 
 spacetime sql tetris-game "SELECT * FROM board_data"
 

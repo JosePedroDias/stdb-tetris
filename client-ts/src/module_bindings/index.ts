@@ -203,19 +203,19 @@ export class RemoteReducers {
     this.connection.offReducer("move_down", callback);
   }
 
-  moveDownFromTimer(timerRow: ScheduleMoveDown) {
-    const __args = { timerRow };
+  moveDownFromTimer(smd: ScheduleMoveDown) {
+    const __args = { smd };
     let __writer = new BinaryWriter(1024);
     MoveDownFromTimer.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("move_down_from_timer", __argsBuffer, this.setCallReducerFlags.moveDownFromTimerFlags);
   }
 
-  onMoveDownFromTimer(callback: (ctx: ReducerEventContext, timerRow: ScheduleMoveDown) => void) {
+  onMoveDownFromTimer(callback: (ctx: ReducerEventContext, smd: ScheduleMoveDown) => void) {
     this.connection.onReducer("move_down_from_timer", callback);
   }
 
-  removeOnMoveDownFromTimer(callback: (ctx: ReducerEventContext, timerRow: ScheduleMoveDown) => void) {
+  removeOnMoveDownFromTimer(callback: (ctx: ReducerEventContext, smd: ScheduleMoveDown) => void) {
     this.connection.offReducer("move_down_from_timer", callback);
   }
 

@@ -1,9 +1,10 @@
 use spacetimedb::rand::Rng;
-use spacetimedb::{ReducerContext, Table};
+use spacetimedb::ReducerContext;
 
 use crate::bricks::{NUM_BRICKS, NUM_VARIANTS, O_INDEX};
 use crate::{
     bricks::{I, J, L, O, S, T, Z},
+    reducers::get_board_data,
     tables::board_data,
     tables::cell,
 };
@@ -22,6 +23,7 @@ pub struct Board {
     pub ghost_y: u8,
     pub score: u32,
     pub lines: u32,
+    pub board_id: u32,
 }
 
 impl Board {
@@ -36,6 +38,7 @@ impl Board {
             ghost_y: 0,
             score: 0,
             lines: 0,
+            board_id: 0,
         };
 
         b.random_piece(ctx);
@@ -43,7 +46,7 @@ impl Board {
         b
     }
 
-    pub fn from_tables(ctx: &ReducerContext) -> Board {
+    pub fn from_tables(ctx: &ReducerContext, board_id: Option<u32>) -> Board {
         let mut b = Board {
             cells: [[0; WIDTH as usize]; HEIGHT as usize],
             selected_piece: 0,
@@ -54,9 +57,17 @@ impl Board {
             ghost_y: 0,
             score: 0,
             lines: 0,
+            board_id: 0,
         };
 
-        let bd = ctx.db.board_data().id().find(1).unwrap();
+        let bd = get_board_data(ctx, board_id);
+
+        if let Some(board_id) = board_id {
+            b.board_id = board_id;
+        } else {
+            b.board_id = bd.id;
+        }
+
         b.selected_piece = bd.selected_piece;
         b.selected_piece_variant = bd.selected_piece_variant;
         b.next_piece = bd.next_piece;
@@ -66,7 +77,7 @@ impl Board {
         b.score = bd.score;
         b.lines = bd.lines;
 
-        for c in ctx.db.cell().iter() {
+        for c in ctx.db.cell().board_id().filter(bd.id) {
             b.cells[c.y as usize][c.x as usize] = c.value;
         }
 
@@ -74,7 +85,7 @@ impl Board {
     }
 
     pub fn to_tables(&self, ctx: &ReducerContext) {
-        let mut bd = ctx.db.board_data().id().find(1).unwrap();
+        let mut bd = get_board_data(ctx, Some(self.board_id));
         bd.selected_piece = self.selected_piece;
         bd.selected_piece_variant = self.selected_piece_variant;
         bd.next_piece = self.next_piece;
@@ -86,7 +97,7 @@ impl Board {
         bd.lines = self.lines;
         ctx.db.board_data().id().update(bd);
 
-        for mut c in ctx.db.cell().iter() {
+        for mut c in ctx.db.cell().board_id().filter(bd.id) {
             let value = self.cells[c.y as usize][c.x as usize];
             if c.value != value {
                 c.value = value;
@@ -179,11 +190,11 @@ impl Board {
     pub fn get_piece(&self) -> [(i8, i8); 4] {
         self.get_piece_(self.selected_piece, self.selected_piece_variant as usize)
     }
-
-    pub fn get_next_piece(&self) -> [(i8, i8); 4] {
-        self.get_piece_(self.next_piece, self.next_piece_variant as usize)
-    }
-
+    /*
+        pub fn get_next_piece(&self) -> [(i8, i8); 4] {
+            self.get_piece_(self.next_piece, self.next_piece_variant as usize)
+        }
+    */
     pub fn rotate_right(&mut self) {
         if self.selected_piece == O_INDEX {
             return;
@@ -309,7 +320,7 @@ impl Board {
         }
         (x0, x1, y0, y1)
     }
-
+    /*
     fn piece_iter<'a>(
         &self,
         pos: (u8, u8),
@@ -318,7 +329,7 @@ impl Board {
         brick
             .iter()
             .map(move |(x, y)| (x + pos.0 as i8, y + pos.1 as i8))
-    }
+    }*/
 
     fn lines_rev_iter(&self) -> impl Iterator<Item = (u8, [u8; WIDTH as usize])> + '_ {
         (0..HEIGHT)
@@ -326,10 +337,11 @@ impl Board {
             .into_iter()
             .map(move |y| (y, self.cells[y as usize]))
     }
-
+    /*
     pub fn line_numbers_iter(&self) -> impl Iterator<Item = u8> {
         (0..HEIGHT).map(move |y| (y))
     }
+    */
 
     pub fn board_iter(&self) -> impl Iterator<Item = (u8, u8, u8)> + '_ {
         (0..HEIGHT)

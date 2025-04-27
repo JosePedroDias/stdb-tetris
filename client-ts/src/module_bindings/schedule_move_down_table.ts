@@ -79,6 +79,28 @@ export class ScheduleMoveDownTableHandle {
       }
     },
   };
+  /**
+   * Access to the `board_id` unique index on the table `schedule_move_down`,
+   * which allows point queries on the field of the same name
+   * via the [`ScheduleMoveDownBoardIdUnique.find`] method.
+   *
+   * Users are encouraged not to explicitly reference this type,
+   * but to directly chain method calls,
+   * like `ctx.db.scheduleMoveDown.board_id().find(...)`.
+   *
+   * Get a handle on the `board_id` unique index on the table `schedule_move_down`.
+   */
+  board_id = {
+    // Find the subscribed row whose `board_id` column value is equal to `col_val`,
+    // if such a row is present in the client cache.
+    find: (col_val: number): ScheduleMoveDown | undefined => {
+      for (let row of this.tableCache.iter()) {
+        if (deepEqual(row.board_id, col_val)) {
+          return row;
+        }
+      }
+    },
+  };
 
   onInsert = (cb: (ctx: EventContext, row: ScheduleMoveDown) => void) => {
     return this.tableCache.onInsert(cb);

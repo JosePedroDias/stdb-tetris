@@ -33,6 +33,7 @@ import {
 export type ScheduleMoveDown = {
   id: bigint,
   scheduledAt: { tag: "Interval", value: TimeDuration } | { tag: "Time", value: Timestamp },
+  boardId: number,
 };
 
 /**
@@ -47,6 +48,7 @@ export namespace ScheduleMoveDown {
     return AlgebraicType.createProductType([
       new ProductTypeElement("id", AlgebraicType.createU64Type()),
       new ProductTypeElement("scheduledAt", AlgebraicType.createScheduleAtType()),
+      new ProductTypeElement("boardId", AlgebraicType.createU32Type()),
     ]);
   }
 

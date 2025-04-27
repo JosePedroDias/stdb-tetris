@@ -1,4 +1,4 @@
-use spacetimedb::ScheduleAt;
+use spacetimedb::{Identity, ScheduleAt};
 
 use crate::reducers::move_down_from_timer;
 
@@ -9,20 +9,23 @@ pub struct Cell {
     #[primary_key]
     pub id: u32,
 
-    //#[index(btree)]
-    //board_id: bool,
-    //
+    #[index(btree)]
+    pub board_id: u32,
+
     pub x: u8,
     pub y: u8,
     pub value: u8,
 }
 
 #[spacetimedb::table(name = board_data, public)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct BoardData {
     #[auto_inc]
     #[primary_key]
     pub id: u32,
+
+    #[index(btree)]
+    pub owner: Identity,
 
     pub selected_piece: u8,
     pub selected_piece_variant: u8,
@@ -42,4 +45,7 @@ pub struct ScheduleMoveDown {
     #[auto_inc]
     pub id: u64,
     pub scheduled_at: ScheduleAt,
+
+    #[unique]
+    pub board_id: u32,
 }

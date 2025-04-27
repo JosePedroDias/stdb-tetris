@@ -32,6 +32,7 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 export type BoardData = {
   id: number,
+  owner: Identity,
   selectedPiece: number,
   selectedPieceVariant: number,
   nextPiece: number,
@@ -54,6 +55,7 @@ export namespace BoardData {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("id", AlgebraicType.createU32Type()),
+      new ProductTypeElement("owner", AlgebraicType.createIdentityType()),
       new ProductTypeElement("selectedPiece", AlgebraicType.createU8Type()),
       new ProductTypeElement("selectedPieceVariant", AlgebraicType.createU8Type()),
       new ProductTypeElement("nextPiece", AlgebraicType.createU8Type()),

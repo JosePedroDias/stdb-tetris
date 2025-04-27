@@ -32,6 +32,7 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 export type Cell = {
   id: number,
+  boardId: number,
   x: number,
   y: number,
   value: number,
@@ -48,6 +49,7 @@ export namespace Cell {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("id", AlgebraicType.createU32Type()),
+      new ProductTypeElement("boardId", AlgebraicType.createU32Type()),
       new ProductTypeElement("x", AlgebraicType.createU8Type()),
       new ProductTypeElement("y", AlgebraicType.createU8Type()),
       new ProductTypeElement("value", AlgebraicType.createU8Type()),

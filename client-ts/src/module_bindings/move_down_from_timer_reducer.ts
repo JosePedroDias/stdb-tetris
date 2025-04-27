@@ -34,7 +34,7 @@ import {
 import { ScheduleMoveDown as __ScheduleMoveDown } from "./schedule_move_down_type";
 
 export type MoveDownFromTimer = {
-  timerRow: __ScheduleMoveDown,
+  smd: __ScheduleMoveDown,
 };
 
 /**
@@ -47,7 +47,7 @@ export namespace MoveDownFromTimer {
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("timerRow", __ScheduleMoveDown.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("smd", __ScheduleMoveDown.getTypeScriptAlgebraicType()),
     ]);
   }
 
