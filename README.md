@@ -8,14 +8,17 @@ clear && spacetime publish --project-path server-rs tetris-game --delete-data -y
 spacetime generate --lang typescript --out-dir client-ts/src/module_bindings --project-path server-rs
 
 spacetime logs tetris-game
+
 spacetime sql tetris-game "SELECT * FROM cell"
+spacetime sql tetris-game "SELECT COUNT(*) as count FROM cell"
+
 spacetime sql tetris-game "SELECT * FROM board_data"
-spacetime call tetris-game who_am_i
+
+spacetime call tetris-game move_down
 
 cd client-ts
-
 clear && npm run build && npm run preview
-npm run dev
+(or) npm run dev
 ```
 
 ## TODO

@@ -38,6 +38,10 @@ import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
 import { MoveDown } from "./move_down_reducer.ts";
 export { MoveDown };
+import { MoveLeft } from "./move_left_reducer.ts";
+export { MoveLeft };
+import { MoveRight } from "./move_right_reducer.ts";
+export { MoveRight };
 
 // Import and reexport all table handle types
 import { BoardDataTableHandle } from "./board_data_table.ts";
@@ -77,6 +81,14 @@ const REMOTE_MODULE = {
       reducerName: "move_down",
       argsType: MoveDown.getTypeScriptAlgebraicType(),
     },
+    move_left: {
+      reducerName: "move_left",
+      argsType: MoveLeft.getTypeScriptAlgebraicType(),
+    },
+    move_right: {
+      reducerName: "move_right",
+      argsType: MoveRight.getTypeScriptAlgebraicType(),
+    },
   },
   // Constructors which are used by the DbConnectionImpl to
   // extract type information from the generated RemoteModule.
@@ -107,6 +119,8 @@ export type Reducer = never
 | { name: "IdentityConnected", args: IdentityConnected }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "MoveDown", args: MoveDown }
+| { name: "MoveLeft", args: MoveLeft }
+| { name: "MoveRight", args: MoveRight }
 ;
 
 export class RemoteReducers {
@@ -140,12 +154,46 @@ export class RemoteReducers {
     this.connection.offReducer("move_down", callback);
   }
 
+  moveLeft() {
+    this.connection.callReducer("move_left", new Uint8Array(0), this.setCallReducerFlags.moveLeftFlags);
+  }
+
+  onMoveLeft(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("move_left", callback);
+  }
+
+  removeOnMoveLeft(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("move_left", callback);
+  }
+
+  moveRight() {
+    this.connection.callReducer("move_right", new Uint8Array(0), this.setCallReducerFlags.moveRightFlags);
+  }
+
+  onMoveRight(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("move_right", callback);
+  }
+
+  removeOnMoveRight(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("move_right", callback);
+  }
+
 }
 
 export class SetReducerFlags {
   moveDownFlags: CallReducerFlags = 'FullUpdate';
   moveDown(flags: CallReducerFlags) {
     this.moveDownFlags = flags;
+  }
+
+  moveLeftFlags: CallReducerFlags = 'FullUpdate';
+  moveLeft(flags: CallReducerFlags) {
+    this.moveLeftFlags = flags;
+  }
+
+  moveRightFlags: CallReducerFlags = 'FullUpdate';
+  moveRight(flags: CallReducerFlags) {
+    this.moveRightFlags = flags;
   }
 
 }

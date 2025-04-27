@@ -97,11 +97,50 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
 
 #[spacetimedb::reducer]
 pub fn move_down(ctx: &ReducerContext) {
-    log::info!("move_down called by {}.", ctx.sender);
+    //log::info!("move_down called by {}.", ctx.sender);
     let mut b = Board::from_tables(ctx);
 
     b.unapply_piece();
-    b.move_down();
+    let down_ok = b.move_down();
+    if down_ok {
+        b.apply_piece();
+    } else {
+        b.apply_piece();
+        b.detect_lines();
+        let game_continues = b.random_piece(ctx);
+        if !game_continues {
+            //is_game_over = true;
+            log::info!("TODO: GAME OVER");
+        }
+        b.apply_piece();
+    }
+
+    b.to_tables(ctx);
+}
+
+#[spacetimedb::reducer]
+pub fn move_left(ctx: &ReducerContext) {
+    //log::info!("move_left called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    if !b.move_left() {
+        return;
+    }
+    b.apply_piece();
+
+    b.to_tables(ctx);
+}
+
+#[spacetimedb::reducer]
+pub fn move_right(ctx: &ReducerContext) {
+    //log::info!("move_right called by {}.", ctx.sender);
+    let mut b = Board::from_tables(ctx);
+
+    b.unapply_piece();
+    if !b.move_right() {
+        return;
+    }
     b.apply_piece();
 
     b.to_tables(ctx);

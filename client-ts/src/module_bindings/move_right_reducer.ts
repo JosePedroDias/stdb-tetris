@@ -31,12 +31,12 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 
-export type WhoAmI = {};
+export type MoveRight = {};
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace WhoAmI {
+export namespace MoveRight {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
@@ -46,12 +46,12 @@ export namespace WhoAmI {
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: WhoAmI): void {
-    WhoAmI.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: MoveRight): void {
+    MoveRight.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): WhoAmI {
-    return WhoAmI.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): MoveRight {
+    return MoveRight.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

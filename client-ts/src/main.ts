@@ -24,13 +24,6 @@ const onConnect = (
     
     conn.subscriptionBuilder().subscribe('SELECT * FROM cell'); // TODO do i need id, or just x and y?
     conn.subscriptionBuilder().subscribe('SELECT * FROM board_data'); // TODO skip pos_x, pos_y
-
-    /*
-    conn.reducers.onWhoAmI(() => {
-        console.log('Message sent.');
-    });
-    conn.reducers.whoAmI();
-    */
 };
 
 const onDisconnect = () => {
@@ -91,11 +84,10 @@ onKey((key: string, isDown: boolean) => {
     } else if (isRotateRight(key)) {
         console.log('rotate right');
     } else if (isMoveLeft(key)) {
-        console.log('move left');
+        conn.reducers.moveLeft();
     } else if (isMoveRight(key)) {
-        console.log('move right');
+        conn.reducers.moveRight();
     } else if (isMoveDown(key)) {
-        //console.log('move down');
         conn.reducers.moveDown();
     } else if (isDrop(key)) {
         console.log('drop');
