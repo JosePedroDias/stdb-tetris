@@ -4,7 +4,14 @@ export const HEIGHT = 20;
 export class Board {
     cells: number[][];
 
+    selectedPiece: number = 0; // 1 - 6
+    selectedPieceVariant: number = 0; // 0 - 3
+
     nextPiece: number = 0; // 1 - 6
+    nextPieceVariant: number = 0; // 0 - 3
+
+    ghostX: number = 0;
+    ghostY: number = 0;
 
     score: number = 0;
     lines: number = 0;

@@ -1,5 +1,7 @@
 import { Board, WIDTH, HEIGHT } from "./Board";
 
+import { I, J, L, O, S, T, Z } from "./bricks";
+
 const SCL = 12;
 
 const COLORS = [
@@ -11,6 +13,16 @@ const COLORS = [
     "orange",
     "cyan",
 ];
+
+const BRICKS = [
+    I,
+    J,
+    L,
+    O,
+    S,
+    T,
+    Z,
+]
 
 export class BoardCanvas {
     canvas: HTMLCanvasElement;
@@ -29,21 +41,35 @@ export class BoardCanvas {
 
     resizeCanvas() {
         //const rect = this.canvas.getBoundingClientRect();
-        this.canvas.width = WIDTH * SCL;
+        this.canvas.width = (WIDTH + 5) * SCL;
         this.canvas.height = HEIGHT * SCL;
+    }
+
+    drawPiece(dx: number, dy: number, piece: number, variant: number) {
+        const ctx = this.ctx;
+        const brickCells = BRICKS[piece][variant];
+        ctx.fillStyle = COLORS[piece];
+        for (let [x, y] of brickCells) {
+            ctx.fillRect((x+dx) * SCL, (y+dy) * SCL, SCL, SCL);
+        }
     }
 
     draw() {
         const ctx = this.ctx;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.isOurs) {
-            //ctx.fillStyle = "#440044";
-            //ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.fillStyle = "#000000";
         } else {
-            //ctx.globalAlpha = 0.75;
             ctx.fillStyle = "#333333";
-            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
+        ctx.fillRect(0, 0, WIDTH * SCL, HEIGHT * SCL);
+
+        // cells from ghost piece
+        ctx.globalAlpha = 0.5;
+        this.drawPiece(this.board.ghostX, this.board.ghostY, this.board.selectedPiece, this.board.selectedPieceVariant);
+        ctx.globalAlpha = 1;
+
+        // cells in the grid
         for (let y = 0; y < HEIGHT; y++) {
             for (let x = 0; x < WIDTH; x++) {
                 const cell = this.board.getCell(x, y);
@@ -53,6 +79,10 @@ export class BoardCanvas {
                 }
             }
         }
+
+        // cells from next piece
+        this.drawPiece(WIDTH + 2, 2, this.board.nextPiece, this.board.nextPieceVariant);
+
         ctx.font = "14px Arial";
         ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
         ctx.fillText(`score:${this.board.score} lines:${this.board.lines}`, 2, 14);

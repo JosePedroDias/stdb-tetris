@@ -67,18 +67,26 @@ conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
     //console.log('New bd:', bd);
     b.lines = bd.lines;
     b.score = bd.score;
-    //b.nextPiece = bd.nextPiece;
+    b.selectedPiece = bd.selectedPiece;
+    b.selectedPieceVariant= bd.selectedPieceVariant;
+    b.nextPiece = bd.nextPiece;
+    b.nextPieceVariant = bd.nextPieceVariant;
+    b.ghostX = bd.posX;
+    b.ghostY = bd.ghostY;
 });
 conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) => {
-    if (_bd.score !== bd.score || _bd.lines !== bd.lines) {
-        const boardId = bd.id;
-        const [b, _] = getBoard(boardId);
+    const boardId = bd.id;
+    const [b, _] = getBoard(boardId);
 
-        console.log(`Bd updated to: ${JSON.stringify(bd, (a, b) => { return a === 'owner' ? 'X' : b; })}`);
-        b.lines = bd.lines;
-        b.score = bd.score;
-        //b.nextPiece = bd.nextPiece;
-    }
+    console.log(`Bd updated to: ${JSON.stringify(bd, (a, b) => { return a === 'owner' ? 'X' : b; })}`);
+    b.lines = bd.lines;
+    b.score = bd.score;
+    b.selectedPiece = bd.selectedPiece;
+    b.selectedPieceVariant= bd.selectedPieceVariant;
+    b.nextPiece = bd.nextPiece;
+    b.nextPieceVariant = bd.nextPieceVariant;
+    b.ghostX = bd.posX;
+    b.ghostY = bd.ghostY;
 });
 /*conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
     //console.log('Bd deleted:', bd);
@@ -88,22 +96,25 @@ conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) =
 });*/
 
 conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
-    const [b, bc] = getBoard( c.boardId);
-
+    const [b, _bc] = getBoard( c.boardId);
     //console.log('New cell:', c);
     b.setCell(c.x, c.y, c.value);
-    bc.draw(); // TODO
 });
 conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
-    const [b, bc] = getBoard( c.boardId);
-
+    const [b, _bc] = getBoard( c.boardId);
     //console.log('Cell updated to:', c);
     b.setCell(c.x, c.y, c.value);
-    bc.draw(); // TODO
 });
 /*conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
     //console.log('Cell deleted:', c);
 });*/
+
+function onTick() {
+    requestAnimationFrame(onTick);
+    boardMap.forEach(([_, bc]) => bc.draw());
+}
+
+onTick();
 
 onKey((key: string, isDown: boolean) => {
     if (!isDown) return;

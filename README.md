@@ -24,6 +24,9 @@ clear && npm run build && npm run preview
 
 ## TODO
 
+- expose methods to get client internal state to bots
+- add board_filled bool column to board_data to enforce game_over
+
 - create keys for game_id, group players in sessions of N (2, ...)
 - if more than X lines (2?), send garbage to another random player
 - drop should trigger another piece to be added right away, not on next tick
