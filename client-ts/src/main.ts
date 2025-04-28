@@ -73,6 +73,7 @@ conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
     b.nextPieceVariant = bd.nextPieceVariant;
     b.ghostX = bd.posX;
     b.ghostY = bd.ghostY;
+    b.dirty = true;
 });
 conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) => {
     const boardId = bd.id;
@@ -87,6 +88,7 @@ conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) =
     b.nextPieceVariant = bd.nextPieceVariant;
     b.ghostX = bd.posX;
     b.ghostY = bd.ghostY;
+    b.dirty = true;
 });
 /*conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
     //console.log('Bd deleted:', bd);
@@ -99,11 +101,13 @@ conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
     const [b, _bc] = getBoard( c.boardId);
     //console.log('New cell:', c);
     b.setCell(c.x, c.y, c.value);
+    b.dirty = true;
 });
 conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
     const [b, _bc] = getBoard( c.boardId);
     //console.log('Cell updated to:', c);
     b.setCell(c.x, c.y, c.value);
+    b.dirty = true;
 });
 /*conn.db.cell.onDelete((_ctx: EventContext, c: Cell) => {
     //console.log('Cell deleted:', c);
@@ -111,7 +115,12 @@ conn.db.cell.onUpdate((_ctx: EventContext, _c: Cell, c: Cell) => {
 
 function onTick() {
     requestAnimationFrame(onTick);
-    boardMap.forEach(([_, bc]) => bc.draw());
+    boardMap.forEach(([b, bc]) => {
+        if (b.dirty) {
+            bc.draw();
+            b.dirty = false;
+        }
+    });
 }
 
 onTick();

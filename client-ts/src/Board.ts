@@ -16,9 +16,8 @@ export class Board {
     score: number = 0;
     lines: number = 0;
 
-    // ghostX
-    // ghostY
-    
+    dirty: boolean = true;
+
     constructor() {
         this.cells = Array.from({ length: HEIGHT }, () => Array(WIDTH).fill(0));
     }
