@@ -22,6 +22,14 @@ function getBoard(id: number): [Board, BoardCanvas] {
     }
 }
 
+function deleteBoard(id: number) {
+    if (boardMap.has(id)) {
+        const [_, bc] = boardMap.get(id)!;
+        bc.canvas.remove();
+        boardMap.delete(id);
+    }
+}
+
 const onConnect = (
     _conn: DbConnection,
     identity: Identity,
@@ -95,12 +103,10 @@ conn.db.boardData.onUpdate((_ctx: EventContext, _bd: BoardData, bd: BoardData) =
     b.ghostY = bd.ghostY;
     b.dirty = true;
 });
-/*conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
+conn.db.boardData.onDelete((_ctx: EventContext, bd: BoardData) => {
+    deleteBoard(bd.id);
     //console.log('Bd deleted:', bd);
-    b.lines = bd.lines;
-    b.score = bd.score;
-    b.nextPiece = bd.nextPiece;
-});*/
+});
 
 conn.db.cell.onInsert((_ctx: EventContext, c: Cell) => {
     const [b, _bc] = getBoard( c.boardId);

@@ -1,9 +1,16 @@
-use crate::tetris::Board;
+use crate::{
+    tables::{game, player},
+    tetris::Board,
+};
 
 use spacetimedb::{ReducerContext, ScheduleAt, Table};
 use std::time::Duration;
 
-use crate::tables::{board_data, cell, schedule_move_down, BoardData, Cell, ScheduleMoveDown};
+use crate::tables::{
+    board_data, cell, schedule_move_down, BoardData, Cell, Game, Player, ScheduleMoveDown,
+};
+
+pub const GAME_NR_OF_PLAYERS: u8 = 4;
 
 #[spacetimedb::reducer(init)]
 pub fn init(_ctx: &ReducerContext) {
@@ -13,7 +20,7 @@ pub fn init(_ctx: &ReducerContext) {
     log::info!("tetris-game init just ran");
 }
 
-fn prepare_board(ctx: &ReducerContext) {
+fn prepare_board(ctx: &ReducerContext) -> u32 {
     let mut b = Board::new(ctx);
 
     b.apply_piece();
@@ -44,11 +51,7 @@ fn prepare_board(ctx: &ReducerContext) {
         });
     }
 
-    ctx.db.schedule_move_down().insert(ScheduleMoveDown {
-        id: 0,
-        scheduled_at: ScheduleAt::Interval(Duration::from_millis(500).into()), // 2 fps ~ 500 ms
-        board_id: bd.id,
-    });
+    bd.id
 }
 
 fn release_board(ctx: &ReducerContext) {
@@ -60,7 +63,7 @@ fn release_board(ctx: &ReducerContext) {
 
     ctx.db.board_data().id().delete(bd.id);
 
-    ctx.db.schedule_move_down().board_id().delete(bd.id);
+    //ctx.db.schedule_move_down().board_id().delete(bd.id);
 }
 
 pub fn get_board_data(ctx: &ReducerContext, board_id: Option<u32>) -> BoardData {
@@ -81,7 +84,28 @@ pub fn identity_connected(ctx: &ReducerContext) {
     // Called everytime a new client connects
     log::info!("client {} connected.", ctx.sender);
 
-    prepare_board(ctx);
+    let board_id = prepare_board(ctx);
+
+    ctx.db.player().insert(Player {
+        id: ctx.sender,
+        game_id: 0,
+        board_id,
+    });
+
+    let free_players: Vec<Player> = ctx.db.player().game_id().filter(0u32).collect();
+
+    if free_players.len() == GAME_NR_OF_PLAYERS as usize {
+        let game = ctx.db.game().insert(Game { id: 0 });
+        for mut pl in free_players {
+            pl.game_id = game.id;
+            ctx.db.player().id().update(pl);
+        }
+        ctx.db.schedule_move_down().insert(ScheduleMoveDown {
+            id: 0,
+            scheduled_at: ScheduleAt::Interval(Duration::from_millis(500).into()), // 2 fps ~ 500 ms
+            game_id: game.id,
+        });
+    }
 
     log::info!("client connected done");
 }
@@ -93,12 +117,32 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
 
     release_board(ctx);
 
+    let pl = ctx.db.player().id().find(ctx.sender).unwrap();
+    let game_id = pl.game_id;
+    ctx.db.player().delete(pl);
+
+    let players_left_in_the_game = ctx.db.player().game_id().filter(game_id).count();
+    if players_left_in_the_game == 0 {
+        log::info!("game became empty. finishing it...");
+        let smd = ctx.db.schedule_move_down().game_id().find(game_id).unwrap();
+        ctx.db.schedule_move_down().delete(smd);
+        ctx.db.game().id().delete(game_id);
+        log::info!("game and timer cleaned");
+    } else {
+        log::info!(
+            "game still in place with {} players",
+            players_left_in_the_game
+        );
+    }
+
     log::info!("client {} disconnected done.", ctx.sender);
 }
 
 #[spacetimedb::reducer]
 pub fn move_down_from_timer(ctx: &ReducerContext, smd: ScheduleMoveDown) {
-    move_down_(ctx, Some(smd.board_id));
+    for pl in ctx.db.player().game_id().filter(smd.game_id) {
+        move_down_(ctx, Some(pl.board_id));
+    }
 }
 
 #[spacetimedb::reducer]
@@ -121,7 +165,9 @@ fn move_down_(ctx: &ReducerContext, board_id: Option<u32>) {
         if !game_continues {
             //is_game_over = true; // set this value to the game
             log::info!("GAME OVER");
-            ctx.db.schedule_move_down().board_id().delete(b.board_id);
+
+            // TODO kill timer once all players left
+            //ctx.db.schedule_move_down().board_id().delete(b.board_id);
         }
         b.apply_piece();
     }

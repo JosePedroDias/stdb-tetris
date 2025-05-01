@@ -47,5 +47,25 @@ pub struct ScheduleMoveDown {
     pub scheduled_at: ScheduleAt,
 
     #[unique]
+    pub game_id: u32,
+}
+
+#[spacetimedb::table(name = game)]
+#[derive(Debug, Clone)]
+pub struct Game {
+    #[primary_key]
+    #[auto_inc]
+    pub id: u32,
+}
+
+#[spacetimedb::table(name = player)]
+#[derive(Debug, Clone)]
+pub struct Player {
+    #[primary_key]
+    pub id: Identity,
+
+    #[index(btree)]
+    pub game_id: u32,
+
     pub board_id: u32,
 }

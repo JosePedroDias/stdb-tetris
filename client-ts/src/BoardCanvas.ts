@@ -36,11 +36,9 @@ export class BoardCanvas {
         this.ctx = this.canvas.getContext("2d")!;
         this.board = board;
         this.resizeCanvas();
-        //window.addEventListener("resize", () => this.resizeCanvas());
     }
 
     resizeCanvas() {
-        //const rect = this.canvas.getBoundingClientRect();
         this.canvas.width = (WIDTH + 5) * SCL;
         this.canvas.height = HEIGHT * SCL;
     }
