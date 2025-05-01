@@ -24,6 +24,13 @@ clear && npm run build && npm run preview
 
 ## TODO
 
+- C prioritize the player's board vs opponents (order the player to be the leftmost, scale down opponents)
+- S a single timer per boards-in-the-game (less resources, should look nicer seeing the movements in sync)
+- S send garbage line(s) to random opponent when player breaks above n lines (3 -> 1, 4 -> 2)
+
+- S/C? game table (links all the players in the same game together)
+- basic lobby-less synced start by waiting for min number of players
+- lobby state -> ready -> start shared game
 - expose methods to get client internal state to bots
 - add board_filled bool column to board_data to enforce game_over
 

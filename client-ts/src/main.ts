@@ -62,6 +62,11 @@ conn.db.boardData.onInsert((_ctx: EventContext, bd: BoardData) => {
 
     if (bd.owner.isEqual(ourIdentity as Identity)) {
         bc.isOurs = true;
+        bc.canvas.classList.add('ours');
+    } else {
+        const w = Math.round(bc.canvas.width * 0.5);
+        bc.canvas.style.width = `${w}px`;
+        bc.canvas.classList.add('opponent');
     }
 
     //console.log('New bd:', bd);

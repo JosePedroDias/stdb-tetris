@@ -81,10 +81,18 @@ export class BoardCanvas {
         }
 
         // cells from next piece
-        this.drawPiece(WIDTH + 2, 2, this.board.nextPiece, this.board.nextPieceVariant);
+        this.drawPiece(WIDTH + 2, 4, this.board.nextPiece, this.board.nextPieceVariant);
 
         ctx.font = "14px Arial";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-        ctx.fillText(`score:${this.board.score} lines:${this.board.lines}`, 2, 14);
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "right";
+        {
+            const x = (WIDTH + 4)* SCL;
+            let y = 9 * SCL;
+            ctx.fillText(`score:`, x, y);               y += 20;
+            ctx.fillText(`${this.board.score}`, x, y);  y += 40;
+            ctx.fillText(`lines:`, x, y);               y += 20;
+            ctx.fillText(`${this.board.lines}`, x, y);
+        }
     }
 }
